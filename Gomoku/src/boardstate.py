@@ -14,74 +14,50 @@ class BoardState:
     def copy(self) -> 'BoardState':
         return BoardState(self.board.copy(), self.current_player)
 
-    def validate_move_by_position(self, position=None) -> bool:
-        if not position is None:
-            # print("move is being validated: position " + str(position))
-            return self.board[position[1], position[0]] == 0
-        else:
-            # print("invalid position")
-            return False
+    def validate_move_by_position(self, position) -> bool:
+        return self.board[position[1], position[0]] == 0
 
-    def create_figure(self, position=None, color=None):
-        if not position is None and not color is None:
-            # position[x, y]
-            # color = white/black
-            self.board[position[1], position[0]] = color
+    def create_figure(self, position, color):
+        # position[x, y]
+        # color = white/black
+        self.board[position[1], position[0]] = color
 
 
-    def check_diagonal_lanes(self, left_top_coords=None, color=None):
-        if not color is None and not left_top_coords is None:
-            first_diag = 0
-            second_diag = 0
-            for i in range(5):
-                if self.board[left_top_coords[1] + i, left_top_coords[0] + i] == color:
-                    first_diag += 1 * color
-            for i in range(5):
-                if self.board[left_top_coords[1] + 4 - i, left_top_coords[0] + i] == color:
-                    second_diag += 1 * color
-            if color > 0:
-                if first_diag > self.longest_white_line:
-                    self.longest_white_line = first_diag
-                if second_diag > self.longest_white_line:
-                    self.longest_white_line = second_diag
-            if color < 0:
-                if first_diag > self.longest_black_line:
-                    self.longest_black_line = first_diag
-                if second_diag > self.longest_black_line:
-                    self.longest_black_line = second_diag
-            return abs(first_diag) == 5 or abs(second_diag) == 5
-        else:
-            return False
+    def check_diagonal_lanes(self, left_top_coords, color):
+        first_diag = 0
+        second_diag = 0
+        for i in range(5):
+            if self.board[left_top_coords[1] + i, left_top_coords[0] + i] == color:
+                first_diag += 1 * color
+        for i in range(5):
+            if self.board[left_top_coords[1] + 4 - i, left_top_coords[0] + i] == color:
+                second_diag += 1 * color
+        if color > 0:
+            self.longest_white_line = max(first_diag, second_diag, self.longest_white_line)
+        if color < 0:
+            self.longest_black_line = max(first_diag, second_diag, self.longest_black_line)
+        return abs(first_diag) == 5 or abs(second_diag) == 5
 
-    def check_lanes(self, left_top_coords=None, color=None):
-        if not color is None and not left_top_coords is None:
+    def check_lanes(self, left_top_coords, color):
+        sum_in_line = 0
+        sum_in_col = 0
+        for i in range(5):
             sum_in_line = 0
             sum_in_col = 0
-            for i in range(5):
-                sum_in_line = 0
-                sum_in_col = 0
-                for j in range(5):
-                    sum_in_line += self.board[left_top_coords[1] + i, left_top_coords[0] + j]
-                    sum_in_col += self.board[left_top_coords[1] + j, left_top_coords[0] + i]
-                if color * sum_in_line == 5:
-                    return True
-                if color * sum_in_col == 5:
-                    return True
-            if color > 0:
-                if sum_in_line > self.longest_white_line:
-                    self.longest_white_line = sum_in_line
-                if sum_in_col > self.longest_white_line:
-                    self.longest_white_line = sum_in_col
-            if color < 0:
-                if sum_in_line > self.longest_black_line:
-                    self.longest_black_line = sum_in_line
-                if sum_in_col > self.longest_black_line:
-                    self.longest_black_line = sum_in_col
-            return False
-        else:
-            return False
+            for j in range(5):
+                sum_in_line += self.board[left_top_coords[1] + i, left_top_coords[0] + j]
+                sum_in_col += self.board[left_top_coords[1] + j, left_top_coords[0] + i]
+            if color * sum_in_line == 5:
+                return True
+            if color * sum_in_col == 5:
+                return True
+        if color > 0:
+            self.longest_white_line = max(sum_in_line, sum_in_col, self.longest_white_line)
+        if color < 0:
+            self.longest_black_line = max(sum_in_line, sum_in_col, self.longest_black_line)
+        return False
 
-    def check_victory_inside_square(self, left_top_coords=None, color=None) -> bool:
+    def check_victory_inside_square(self, left_top_coords, color) -> bool:
         return self.check_lanes(left_top_coords, color) or self.check_diagonal_lanes(left_top_coords, color)
 
     def check_victory(self) -> int:
@@ -93,7 +69,7 @@ class BoardState:
                     return -1
         return 0
 
-    def do_move(self, position=None):
+    def do_move(self, position):
         if self.validate_move_by_position(position):
             self.create_figure(position, self.current_player)
 
