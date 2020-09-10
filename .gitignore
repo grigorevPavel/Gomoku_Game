@@ -1,5 +1,5 @@
 # Byte-compiled / optimized / DLL files
-__pycache__/
+Gomoku_Game/src/__pycache__/
 *.py[cod]
 *.pyc
 *$py.class
