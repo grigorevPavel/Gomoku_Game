@@ -3,8 +3,8 @@ from itertools import product
 import pygame
 from pygame import Surface
 
-from src.ai import AI
-from src.boardstate import BoardState
+from ai import AI
+from boardstate import BoardState
 import time
 
 def draw_board(screen: Surface, pos_x: int, pos_y: int, elem_size: int, board: BoardState):
@@ -31,18 +31,17 @@ def draw_board(screen: Surface, pos_x: int, pos_y: int, elem_size: int, board: B
 
         pygame.draw.circle(screen, figure_color, (position[0] + elem_size // 2, position[1] + elem_size // 2), r)
 
-def change_caption(board=None):
-    if not board is None:
-        if board.winner == 0:
-            if board.current_player > 0:
-                pygame.display.set_caption(TITLE + "White move")
-            else:
-                pygame.display.set_caption(TITLE + "Black move")
+def change_caption(board):
+    if board.winner == 0:
+        if board.current_player > 0:
+            pygame.display.set_caption(TITLE + "White move")
         else:
-            if board.winner > 0:
-                pygame.display.set_caption(TITLE + "White wins the game!!!")
-            else:
-                pygame.display.set_caption(TITLE + "Black wins the game!!!")
+            pygame.display.set_caption(TITLE + "Black move")
+    else:
+        if board.winner > 0:
+            pygame.display.set_caption(TITLE + "White wins the game!!!")
+        else:
+            pygame.display.set_caption(TITLE + "Black wins the game!!!")
 
 def game_loop(screen: Surface, board: BoardState, ai: AI):
     grid_size = screen.get_size()[0] // 15
