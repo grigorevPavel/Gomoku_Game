@@ -1,6 +1,6 @@
 from typing import Optional
 
-from .boardstate import BoardState
+from boardstate import BoardState
 
 import random
 
@@ -25,23 +25,23 @@ class AI:
     def next_move_minimax(self, board, current_depth, maximize):
         if current_depth == 1 or board.winner != 0:
             return self.evaluate_position(board)
+
+        if maximize:
+            maxEvaluation = -self.Inf
         else:
-            if maximize:
-                maxEvaluation = -self.Inf
-                for position in self.get_all_possible_positions(board):
-                    board_copy = board.copy()
-                    board_copy.do_move(position)
-                    evaluation = self.next_move_minimax(board_copy, current_depth - 1, False)
-                    maxEvaluation = max(evaluation, maxEvaluation)
-                return maxEvaluation
-            else:
-                minEvaluation = self.Inf
-                for position in self.get_all_possible_positions(board):
-                    board_copy = board.copy()
-                    board_copy.do_move(position)
-                    evaluation = self.next_move_minimax(board_copy, current_depth - 1, True)
-                    minEvaluation = min(evaluation, minEvaluation)
-                return minEvaluation
+            minEvaluation = self.Inf
+        for position in self.get_all_possible_positions(board):
+            board_copy = board.copy()
+            board_copy.do_move(position)
+            evaluation = self.next_move_minimax(board_copy, current_depth - 1, not maximize)
+            maxEvaluation = max(evaluation, maxEvaluation)
+            minEvaluation = min(evaluation, minEvaluation)
+        if maximize:
+            return maxEvaluation
+        else:
+            return minEvaluation
+
+
 
     def do_move(self, board, depth):
         """
