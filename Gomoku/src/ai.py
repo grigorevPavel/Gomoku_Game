@@ -36,10 +36,8 @@ class AI:
             evaluation = self.next_move_minimax(board_copy, current_depth - 1, not maximize)
             maxEvaluation = max(evaluation, maxEvaluation)
             minEvaluation = min(evaluation, minEvaluation)
-        if maximize:
-            return maxEvaluation
-        else:
-            return minEvaluation
+        eval = max(evaluation, maxEvaluation) if maximize else min(evaluation, minEvaluation)
+        return eval
 
 
 
