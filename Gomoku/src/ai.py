@@ -15,31 +15,26 @@ class AI:
     def get_all_possible_positions(self, board: BoardState) -> Optional[BoardState]:
         # print("ai considers these moves to be possible at this position")
         positions = []
-        for i in range(15):
-            for j in range(15):
+        for j in range(board.left_most_position - 1, board.right_most_position + 2):
+            for i in range(board.top_most_position - 1, board.bottom_most_position + 2):
                 position = [i, j]
                 if board.validate_move_by_position(position):
                     positions.append(position)
         return positions
 
     def next_move_minimax(self, board, current_depth, maximize):
-        if current_depth == 1 or board.winner != 0:
+        if current_depth == 0 or board.winner != 0:
             return self.evaluate_position(board)
 
-        if maximize:
-            maxEvaluation = -self.Inf
-        else:
-            minEvaluation = self.Inf
+        maxEvaluation = -self.Inf
+        minEvaluation = self.Inf
         for position in self.get_all_possible_positions(board):
             board_copy = board.copy()
             board_copy.do_move(position)
             evaluation = self.next_move_minimax(board_copy, current_depth - 1, not maximize)
             maxEvaluation = max(evaluation, maxEvaluation)
             minEvaluation = min(evaluation, minEvaluation)
-        eval = max(evaluation, maxEvaluation) if maximize else min(evaluation, minEvaluation)
-        return eval
-
-
+        return maxEvaluation if maximize else minEvaluation
 
     def do_move(self, board, depth):
         """
@@ -49,7 +44,7 @@ class AI:
         board.do_move(position)
         """
 
-        maxEval = -self.Inf
+        maxEval = -self.Inf # for black figures ai should minimize the evaluation
         for position in self.get_all_possible_positions(board):
             board_copy = board.copy()
             board_copy.do_move(position)
@@ -61,7 +56,10 @@ class AI:
 
 
     def evaluate_position(self, board: BoardState):
-        if self.color > 0:
-            return board.longest_white_line
+        if board.winner == 0:
+            if self.color > 0:
+                return board.longest_white_line * -1
+            else:
+                return board.longest_black_line
         else:
-            return board.longest_black_line
+            return -1 * board.winner * self.Inf
