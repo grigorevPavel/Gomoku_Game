@@ -46,14 +46,15 @@ def change_caption(board, MODE):
             pygame.display.set_caption(TITLE + line)
         else:
             line = "Black move"
-            if board.white_open_pattern:
+            if board.black_open_pattern:
                 line += " : Black have almost won"
             pygame.display.set_caption(TITLE + line)
     else:
         if board.winner > 0:
-            pygame.display.set_caption(TITLE + "White wins the game!!!")
+            pygame.display.set_caption(TITLE + "White wins the game!!! Press R to restart")
         else:
-            pygame.display.set_caption(TITLE + "Black wins the game!!!")
+            pygame.display.set_caption(TITLE + "Black wins the game!!! Press R to restart")
+
 
 def game_loop(screen: Surface, board: BoardState, ai: AI):
     grid_size = screen.get_size()[0] // 15
@@ -84,13 +85,14 @@ def game_loop(screen: Surface, board: BoardState, ai: AI):
                 return
             if board.winner == 0:
                 if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+
                     if MODE == MODES[0]:
                         x_pos, y_pos = [p // grid_size for p in event.pos]
                         position = [x_pos, y_pos]
                         board.do_move(position)
                         if board.winner != 0:
                             print("There is a winner in a game:" + str(board.winner))
-                        change_caption(board)
+                        change_caption(board, MODE)
                     if MODE == MODES[1]:
                         x_pos, y_pos = [p // grid_size for p in event.pos]
                         position = [x_pos, y_pos]
@@ -105,6 +107,11 @@ def game_loop(screen: Surface, board: BoardState, ai: AI):
                                 change_caption(board, MODE)
             else:
                 print("Moves are not allowed\nThere is a winner in a game: " + str(board.winner))
+                change_caption(board, MODE)
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        board = BoardState.initial_state()
+                        change_caption(board, MODE)
 
         draw_board(screen, 0, 0, grid_size, board)
         pygame.display.flip()
