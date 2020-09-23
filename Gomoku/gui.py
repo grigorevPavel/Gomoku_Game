@@ -3,8 +3,8 @@ from itertools import product
 import pygame
 from pygame import Surface
 
-from ai import AI
-from boardstate import BoardState
+from src.ai import AI
+from src.boardstate import BoardState
 import time
 
 def draw_board(screen: Surface, pos_x: int, pos_y: int, elem_size: int, board: BoardState):
@@ -31,12 +31,24 @@ def draw_board(screen: Surface, pos_x: int, pos_y: int, elem_size: int, board: B
 
         pygame.draw.circle(screen, figure_color, (position[0] + elem_size // 2, position[1] + elem_size // 2), r)
 
-def change_caption(board):
+def change_caption(board, MODE):
     if board.winner == 0:
         if board.current_player > 0:
-            pygame.display.set_caption(TITLE + "White move")
+            if MODE == "player":
+                line = "White move"
+            elif MODE == "ai":
+                line = "Your move"
+            if board.white_open_pattern:
+                if MODE == "player":
+                    line += " : White have almost won"
+                elif MODE == "ai":
+                    line += " : You have almost won"
+            pygame.display.set_caption(TITLE + line)
         else:
-            pygame.display.set_caption(TITLE + "Black move")
+            line = "Black move"
+            if board.white_open_pattern:
+                line += " : Black have almost won"
+            pygame.display.set_caption(TITLE + line)
     else:
         if board.winner > 0:
             pygame.display.set_caption(TITLE + "White wins the game!!!")
@@ -90,7 +102,7 @@ def game_loop(screen: Surface, board: BoardState, ai: AI):
                                     if board.winner != 0:
                                         print("There is a winner in a game:" + str(board.winner))
                                     pause_for_player = False
-                                change_caption(board)
+                                change_caption(board, MODE)
             else:
                 print("Moves are not allowed\nThere is a winner in a game: " + str(board.winner))
 
